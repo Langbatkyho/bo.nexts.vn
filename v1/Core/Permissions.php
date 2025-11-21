@@ -9,11 +9,6 @@ final class Permissions
     // Quyền truy cập chung
     const ADMIN_ACCESS = 'admin.access';
 
-    // Quyền cho module Faqs
-    const FAQS_VIEW = 'faqs.view';
-    const FAQS_EDIT = 'faqs.edit';
-    const FAQS_DELETE = 'faqs.delete';
-
     // Quyền cho module Settings
     const SETTINGS_VIEW = 'settings.view';
     const SETTINGS_UPDATE_PROFILE = 'settings.update-profile';
