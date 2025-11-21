@@ -16,9 +16,9 @@ body, html {
 }
 
 :root {
-  --color-primary: #d0011b;
-  --color-primary-100: #ffe5e8;
-  --color-primary-900: #af051c;
+  --color-primary: #7a5af8;
+  --color-primary-100: #e0e7ff;
+  --color-primary-900: #3730a3;
 }
 
 .text-brand-700 { color: var(--color-primary) !important; }
@@ -45,11 +45,11 @@ body, html {
 }
 
 .btn-primary:hover {
-  background: #a30317;
+  background: #3730a3;
 }
 
 .btn-primary:active {
-  background: #830313;
+  background: #3730a3;
 }
 
 .btn-secondary {

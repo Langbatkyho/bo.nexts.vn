@@ -185,4 +185,247 @@ class OrderModel extends BaseModel
             throw new Exception("Failed to fetch orders: " . $e->getMessage());
         }
     }
+
+    /**
+     * Lấy tổng số đơn hàng theo điều kiện
+     *
+     * @param array $filters Bộ lọc
+     * @return int Tổng số đơn hàng
+     */
+    public function countOrders($filters = [])
+    {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM `orders` WHERE 1=1";
+            $params = [];
+
+            if (!empty($filters['platform'])) {
+                $sql .= " AND platform = :platform";
+                $params[':platform'] = $filters['platform'];
+            }
+
+            if (!empty($filters['ref_current_status'])) {
+                $sql .= " AND ref_current_status = :ref_current_status";
+                $params[':ref_current_status'] = $filters['ref_current_status'];
+            }
+
+            if (!empty($filters['ref_shop_id'])) {
+                $sql .= " AND ref_shop_id = :ref_shop_id";
+                $params[':ref_shop_id'] = $filters['ref_shop_id'];
+            }
+
+            if (!empty($filters['search'])) {
+                $sql .= " AND (ref_order_id LIKE :search OR ref_order_number LIKE :search)";
+                $params[':search'] = '%' . $filters['search'] . '%';
+            }
+
+            if (!empty($filters['date_from'])) {
+                $sql .= " AND created_at >= :date_from";
+                $params[':date_from'] = $filters['date_from'];
+            }
+
+            if (!empty($filters['date_to'])) {
+                $sql .= " AND created_at <= :date_to";
+                $params[':date_to'] = $filters['date_to'] . ' 23:59:59';
+            }
+
+            $stmt = $this->pdo->prepare($sql);
+            
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return (int)$result['total'];
+        } catch (PDOException $e) {
+            throw new Exception("Failed to count orders: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Lấy đơn hàng theo ID
+     *
+     * @param int $orderId ID đơn hàng
+     * @return array|null Thông tin đơn hàng
+     */
+    public function getOrderById($orderId)
+    {
+        try {
+            $sql = "SELECT * FROM `orders` WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':id', $orderId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
+        } catch (PDOException $e) {
+            throw new Exception("Failed to fetch order by ID: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Lấy lịch sử thay đổi trạng thái của đơn hàng
+     *
+     * @param int $orderId ID đơn hàng
+     * @return array Lịch sử trạng thái
+     */
+    public function getOrderStatusHistory($orderId)
+    {
+        try {
+            $sql = "
+                SELECT * 
+                FROM order_status 
+                WHERE order_id = :order_id 
+                ORDER BY updated_at DESC
+            ";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':order_id', $orderId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Failed to fetch order status history: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Lấy danh sách đơn hàng với thông tin shop
+     *
+     * @param array $filters Bộ lọc
+     * @param int $limit Số lượng bản ghi
+     * @param int $offset Vị trí bắt đầu
+     * @return array Danh sách đơn hàng
+     */
+    public function getOrdersWithShop($filters = [], $limit = 20, $offset = 0)
+    {
+        try {
+            $sql = "
+                SELECT 
+                    o.*,
+                    s.shop_name,
+                    s.platform_shop_code
+                FROM `orders` o
+                LEFT JOIN shop s ON o.ref_shop_id = s.platform_shop_id AND o.platform = s.platform
+                WHERE 1=1
+            ";
+            $params = [];
+
+            if (!empty($filters['platform'])) {
+                $sql .= " AND o.platform = :platform";
+                $params[':platform'] = $filters['platform'];
+            }
+
+            if (!empty($filters['ref_current_status'])) {
+                $sql .= " AND o.ref_current_status = :ref_current_status";
+                $params[':ref_current_status'] = $filters['ref_current_status'];
+            }
+
+            if (!empty($filters['ref_shop_id'])) {
+                $sql .= " AND o.ref_shop_id = :ref_shop_id";
+                $params[':ref_shop_id'] = $filters['ref_shop_id'];
+            }
+
+            if (!empty($filters['search'])) {
+                $sql .= " AND (o.ref_order_id LIKE :search OR o.ref_order_number LIKE :search)";
+                $params[':search'] = '%' . $filters['search'] . '%';
+            }
+
+            if (!empty($filters['date_from'])) {
+                $sql .= " AND o.created_at >= :date_from";
+                $params[':date_from'] = $filters['date_from'];
+            }
+
+            if (!empty($filters['date_to'])) {
+                $sql .= " AND o.created_at <= :date_to";
+                $params[':date_to'] = $filters['date_to'] . ' 23:59:59';
+            }
+
+            $sql .= " ORDER BY o.created_at DESC LIMIT :limit OFFSET :offset";
+
+            $stmt = $this->pdo->prepare($sql);
+            
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Failed to fetch orders with shop: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Xóa đơn hàng
+     *
+     * @param int $orderId ID đơn hàng
+     * @return bool True nếu xóa thành công
+     */
+    public function deleteOrder($orderId)
+    {
+        try {
+            $sql = "DELETE FROM `orders` WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':id', $orderId, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            throw new Exception("Failed to delete order: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Lấy thống kê đơn hàng theo trạng thái
+     *
+     * @param array $filters Bộ lọc bổ sung
+     * @return array Thống kê theo trạng thái
+     */
+    public function getOrderStatsByStatus($filters = [])
+    {
+        try {
+            $sql = "
+                SELECT 
+                    ref_current_status,
+                    COUNT(*) as count
+                FROM `orders`
+                WHERE 1=1
+            ";
+            $params = [];
+
+            if (!empty($filters['platform'])) {
+                $sql .= " AND platform = :platform";
+                $params[':platform'] = $filters['platform'];
+            }
+
+            if (!empty($filters['date_from'])) {
+                $sql .= " AND created_at >= :date_from";
+                $params[':date_from'] = $filters['date_from'];
+            }
+
+            if (!empty($filters['date_to'])) {
+                $sql .= " AND created_at <= :date_to";
+                $params[':date_to'] = $filters['date_to'] . ' 23:59:59';
+            }
+
+            $sql .= " GROUP BY ref_current_status";
+
+            $stmt = $this->pdo->prepare($sql);
+            
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Failed to fetch order statistics: " . $e->getMessage());
+        }
+    }
 }

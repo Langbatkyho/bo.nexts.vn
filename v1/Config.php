@@ -18,8 +18,8 @@ define('DOMAIN', 'nexts.vn');
 define('EMAIL_ADMIN', 'hi@nexts');
 
 // --- CẤU HÌNH LOGO & FAVICON ---
-define('LOGO_WHITE_URL', '/' . APP_VERSION . '/uploads/2025/11/coolmom_logo_white_transparent.png');
-define('LOGO_BLACK_URL', '/' . APP_VERSION . '/uploads/2025/11/coolmom_logo_black_transparent.png');
+define('LOGO_WHITE_URL', '/' . APP_VERSION . '/uploads/2025/11/logo.png');
+define('LOGO_BLACK_URL', '/' . APP_VERSION . '/uploads/2025/11/logo.png');
 define('FAVICON_URL', '/' . APP_VERSION . '/uploads/2025/11/favicon.png');
 
 // --- CẤU HÌNH DATABASE ---
