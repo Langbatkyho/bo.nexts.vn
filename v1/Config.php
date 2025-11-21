@@ -38,43 +38,18 @@ $GLOBALS['app_db_config'] = [
     'DB_CHARSET' => DB_CHARSET_MYSQL,
 ];
 
-// --- CẤU HÌNH HARAVAN ---
-define('HARAVAN_STORE_DOMAIN', 'coolmom.myharavan.com');
-define('HARAVAN_ACCESS_TOKEN', '0920963FD523573789874BE27270B8A8DC5D040AE49DE838988A07624178A499');
-
-// --- CẤU HÌNH GEMINI ---
-define('GEMINI_API_KEYS_BY_EMAIL', [
-    'ninhvh.hkd@gmail.com' => 'AIzaSyCwd2GoOc8e_VY1u7EdyZN_t7piB2A4ejI',
-    'chieubaocong@gmail.com' => 'AIzaSyBHTuTHYJPg-qOFL_EcjFjW9y0hrzWEYDc',
-    'hi.medelavietnam@gmail.com' => 'AIzaSyAJOCRY3kRlZuUOhelU0hRISwOCWnfoj2M',
-    'hi.fatzbabyvietnam@gmail.com' => 'AIzaSyDHnsb2C_WzVffNPgGDJr69EFX4H5TBrE',
-    'haininhtb@gmail.com' => 'AIzaSyCyDf3aoFFuPUI52r5v7TU6K0pPMDvQi9w',
-]);
-
 // --- CẤU HÌNH EMAIL (SMTP) ---
-define('SMTP_HOST', 'smtp.zoho.com');
+define('SMTP_HOST', '');
 define('SMTP_PORT', 465);
-define('SMTP_USERNAME', 'hi@coolmom.vn');
-define('SMTP_PASSWORD', 'cBc911588!@#');
-define('SMTP_FROM_EMAIL', 'hi@coolmom.vn');
-define('SMTP_FROM_NAME', 'Coolmom - Mẹ tròn, con vuông');
-
-// --- CẤU HÌNH API KEYS CHO CÁC HỆ THỐNG CÓ THỂ GỌI ---
-define('EMAIL_SERVICE_API_KEYS', [
-    'AIzaSyCyDf3aoFFuPUI52r5v7TU6K0pPMDvQi9w' => 'affiliate.coolmom.vn',
-    'AIzaSyDHnsb2C_WzVffNPgGDJr69EFX4H5TBrE' => 'bo.coolmom.vn',
-]);
-
-// --- CẤU HÌNH API KEY ĐỂ GỌI CỤC BỘ ---
-define('EMAIL_SERVICE_API_KEY', 'AIzaSyDHnsb2C_WzVffNPgGDJr69EFX4H5TBrE');
-
-// --- COOLMOM AFFILIATE API URL
-define('AFFILIATE_API_BASE_URL', 'https://affiliate.coolmom.vn/api/');
+define('SMTP_USERNAME', '');
+define('SMTP_PASSWORD', '');
+define('SMTP_FROM_EMAIL', '');
+define('SMTP_FROM_NAME', '');
 
 // --- CẤU HÌNH CORS - Danh sách các domain được phép gọi API ---
 define('ALLOWED_CORS_ORIGINS', [
-    'https://coolmom.vn',
-    'https://www.coolmom.vn',
+    'https://nexts.vn',
+    'https://www.nexts.vn',
 ]);
 
 // --- CẤU HÌNH NỀN TẢNG THƯƠNG MẠI ĐIỆN TỬ (E-COMMERCE PLATFORMS) ---
