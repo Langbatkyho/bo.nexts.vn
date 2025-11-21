@@ -19,7 +19,7 @@ class OrderModel extends BaseModel
     {
         try {
             $sql = "SELECT * FROM `orders` WHERE ref_order_id = :ref_order_id AND platform = :platform";
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':ref_order_id', $refOrderId, PDO::PARAM_STR);
             $stmt->bindValue(':platform', $platform, PDO::PARAM_STR);
             $stmt->execute();
@@ -62,7 +62,7 @@ class OrderModel extends BaseModel
                 )
             ";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':ref_order_id', $orderData['ref_order_id'], PDO::PARAM_STR);
             $stmt->bindValue(':platform', $orderData['platform'], PDO::PARAM_STR);
             $stmt->bindValue(':ref_current_status', $orderData['ref_current_status'], PDO::PARAM_STR);
@@ -73,7 +73,7 @@ class OrderModel extends BaseModel
             $stmt->bindValue(':ref_order_number', $orderData['ref_order_number'] ?? null, PDO::PARAM_STR);
 
             $stmt->execute();
-            return $this->db->lastInsertId();
+            return $this->pdo->lastInsertId();
         } catch (PDOException $e) {
             throw new Exception("Failed to create order: " . $e->getMessage());
         }
@@ -100,7 +100,7 @@ class OrderModel extends BaseModel
                 WHERE id = :id
             ";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':new_status', $newStatus, PDO::PARAM_STR);
             $stmt->bindValue(':last_updated_at', $updatedAt, PDO::PARAM_STR);
             $stmt->bindValue(':last_updated_by', $updatedBy, PDO::PARAM_STR);
@@ -130,7 +130,7 @@ class OrderModel extends BaseModel
                 VALUES (:order_id, :old_status, :new_status, :updated_at, :updated_by)
             ";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':order_id', $orderId, PDO::PARAM_INT);
             $stmt->bindValue(':old_status', $oldStatus, PDO::PARAM_STR);
             $stmt->bindValue(':new_status', $newStatus, PDO::PARAM_STR);
@@ -169,7 +169,7 @@ class OrderModel extends BaseModel
 
             $sql .= " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value, PDO::PARAM_STR);

@@ -43,7 +43,7 @@ class WebhookModel extends BaseModel
                 )
             ";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             
             $stmt->bindValue(':platform', $platform, PDO::PARAM_STR);
             $stmt->bindValue(':type', $type, PDO::PARAM_STR);
@@ -54,7 +54,7 @@ class WebhookModel extends BaseModel
 
             $stmt->execute();
 
-            return $this->db->lastInsertId();
+            return $this->pdo->lastInsertId();
         } catch (PDOException $e) {
             throw new Exception("Failed to save webhook to database: " . $e->getMessage());
         }
@@ -70,7 +70,7 @@ class WebhookModel extends BaseModel
     {
         try {
             $sql = "SELECT * FROM webhook WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
 
@@ -104,7 +104,7 @@ class WebhookModel extends BaseModel
 
             $sql .= " WHERE id = :id";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->bindValue(':status', $status, PDO::PARAM_STR);
 
@@ -135,7 +135,7 @@ class WebhookModel extends BaseModel
                 LIMIT :limit
             ";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
 
@@ -167,7 +167,7 @@ class WebhookModel extends BaseModel
                 LIMIT :limit
             ";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':platform', $platform, PDO::PARAM_STR);
             $stmt->bindValue(':type', $type, PDO::PARAM_INT);
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
@@ -197,7 +197,7 @@ class WebhookModel extends BaseModel
                 WHERE id = :id
             ";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
             return $stmt->execute();
@@ -227,7 +227,7 @@ class WebhookModel extends BaseModel
                 WHERE id = :id
             ";
 
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->bindValue(':error_message', $errorMessage, PDO::PARAM_STR);
             $stmt->bindValue(':retries', $newRetries, PDO::PARAM_INT);
