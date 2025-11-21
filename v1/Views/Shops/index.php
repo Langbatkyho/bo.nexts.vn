@@ -1,5 +1,4 @@
 <?php
-// v2/Views/Shops/index.php
 $shops = $data['shops'] ?? [];
 ?>
 <div>
@@ -211,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     connectTiktok.addEventListener('click', function(){
-        window.location.href = '/v2/auth/connect_platform.php?platform=TIKTOK';
+        window.location.href = '/v1/auth/connect_platform.php?platform=TIKTOK';
     });
 
     // Đóng modal khi click bên ngoài

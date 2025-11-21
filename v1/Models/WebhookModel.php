@@ -144,4 +144,97 @@ class WebhookModel extends BaseModel
             throw new Exception("Failed to fetch pending webhooks: " . $e->getMessage());
         }
     }
+
+    /**
+     * Lấy danh sách webhook cần xử lý (pending hoặc failed với retries chưa đạt max)
+     *
+     * @param string $platform Platform cần lọc
+     * @param int $type Loại webhook
+     * @param int $limit Số lượng webhook tối đa
+     * @return array Danh sách webhook
+     */
+    public function getWebhooksToProcess($platform = 'TIKTOK', $type = 1, $limit = 10)
+    {
+        try {
+            $sql = "
+                SELECT id, raw_content, platform, retries, created_date 
+                FROM webhook 
+                WHERE platform = :platform 
+                    AND type = :type 
+                    AND (status = 'pending' OR status = 'failed')
+                    AND retries < max_retries
+                ORDER BY created_date ASC 
+                LIMIT :limit
+            ";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':platform', $platform, PDO::PARAM_STR);
+            $stmt->bindValue(':type', $type, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Failed to fetch webhooks to process: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Cập nhật webhook thành công
+     *
+     * @param int $id ID của webhook
+     * @return bool True nếu cập nhật thành công
+     */
+    public function markAsProcessed($id)
+    {
+        try {
+            $sql = "
+                UPDATE webhook 
+                SET 
+                    status = 'processed',
+                    error_message = NULL,
+                    execute_at = NOW()
+                WHERE id = :id
+            ";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            throw new Exception("Failed to mark webhook as processed: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Cập nhật webhook thất bại
+     *
+     * @param int $id ID của webhook
+     * @param string $errorMessage Thông báo lỗi
+     * @param int $newRetries Số lần thử lại mới
+     * @return bool True nếu cập nhật thành công
+     */
+    public function markAsFailed($id, $errorMessage, $newRetries)
+    {
+        try {
+            $sql = "
+                UPDATE webhook 
+                SET 
+                    status = 'failed',
+                    error_message = :error_message,
+                    retries = :retries,
+                    execute_at = NOW()
+                WHERE id = :id
+            ";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            $stmt->bindValue(':error_message', $errorMessage, PDO::PARAM_STR);
+            $stmt->bindValue(':retries', $newRetries, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            throw new Exception("Failed to mark webhook as failed: " . $e->getMessage());
+        }
+    }
 }
