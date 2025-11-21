@@ -1,0 +1,5 @@
+# Bật RewriteEngine
+RewriteEngine On
+
+# Mặc định, khi chưa đăng nhập thì chuyển hướng tới trang đăng nhập
+RewriteRule ^/?$ /v1/login.php [L]
